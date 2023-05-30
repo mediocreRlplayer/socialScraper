@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-
+	"strings"
 	"github.com/PuerkitoBio/goquery"
 )
 
@@ -42,9 +42,19 @@ func scrapeSocialLinks(url string) ([]string, error) {
 
 // Helper function to check if a URL is a social link
 func isSocialLink(url string) bool {
-	// Implement your logic to determine if the URL is a social link
-	// For example, you can check if the URL contains specific keywords or patterns
-	// Return true if it is a social link, false otherwise
+	// Convert the URL to lowercase for case-insensitive comparison
+	lowercaseURL := strings.ToLower(url)
+
+	// List of social media platforms
+	socialPlatforms := []string{"instagram", "twitter", "facebook", "linkedin"}
+
+	// Check if the lowercaseURL contains any of the social platforms
+	for _, platform := range socialPlatforms {
+		if strings.Contains(lowercaseURL, platform) {
+			return true
+		}
+	}
+
 	return false
 }
 
