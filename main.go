@@ -3,12 +3,29 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	"net/http"
 	"strings"
+	"encoding/json"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/mediocreRLplayer/socialScraper/airtable"
 )
 
 func scrapeSocialLinks(url string) ([]string, error) {
+	apiKey := os.Getenv("AIRTABLE_API_KEY")
+	baseID := "YOUR_BASE_ID"
+	tableName := "YOUR_TABLE_NAME"
+
+	websites, err := airtable.FetchWebsitesFromAirtable(apiKey, baseID, tableName)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Websites:")
+	for _, website := range websites {
+		fmt.Println(website)
+	}
+
 	var socialLinks []string
 
 	// Send a GET request to the website URL
