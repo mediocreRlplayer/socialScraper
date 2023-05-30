@@ -8,7 +8,7 @@ import (
 	"strings"
 	"encoding/json"
 	"github.com/PuerkitoBio/goquery"
-	"github.com/mediocreRLplayer/socialScraper/airtable"
+	"github.com/mediocreRLplayer/socialScraper/pkg/airtable"
 )
 
 func scrapeSocialLinks(url string) ([]string, error) {
