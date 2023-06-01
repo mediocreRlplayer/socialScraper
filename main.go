@@ -6,26 +6,11 @@ import (
 	"os"
 	"net/http"
 	"strings"
-	"encoding/json"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/mediocreRLplayer/socialScraper/pkg/airtable"
 )
 
 func scrapeSocialLinks(url string) ([]string, error) {
-	apiKey := os.Getenv("AIRTABLE_API_KEY")
-	baseID := "YOUR_BASE_ID"
-	tableName := "YOUR_TABLE_NAME"
-
-	websites, err := airtable.FetchWebsitesFromAirtable(apiKey, baseID, tableName)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println("Websites:")
-	for _, website := range websites {
-		fmt.Println(website)
-	}
-
 	var socialLinks []string
 
 	// Send a GET request to the website URL
@@ -45,7 +30,7 @@ func scrapeSocialLinks(url string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	
 	// Find the HTML elements containing social links
 	doc.Find("a").Each(func(i int, s *goquery.Selection) {
 		href, exists := s.Attr("href")
@@ -76,15 +61,35 @@ func isSocialLink(url string) bool {
 }
 
 func main() {
-	url := "https://galaxy.com"
+	apiKey := os.Getenv("AIRTABLE_API_TOKEN")
+	baseID := "appRnPL2MLWnq7en6"
+	tableName := "tblgu7t55U7cZalXw"
 
-	socialLinks, err := scrapeSocialLinks(url)
+	fmt.Printf("key is %v\n", apiKey)
+
+	records, err := airtable.FetchWebsitesFromAirtable(apiKey, baseID, tableName)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Social Links:")
-	for _, link := range socialLinks {
-		fmt.Println(link)
+	fmt.Println("Websites:")
+	for _, record := range records {
+		fmt.Println(record)
+		socialLinks, err := scrapeSocialLinks(record.Fields.Website)
+			if err != nil {
+				fmt.Printf("Error scraping %s: %s\n", record.Fields.Website, err)
+			}
+
+			fmt.Println("Social Links:")
+			for _, link := range socialLinks {
+				fmt.Println(link)
+			}
+			tableAppendErr := airtable.AppendSocialLinksToTable(socialLinks, record.Id, record.Fields.Website, baseID, tableName, apiKey)
+				if tableAppendErr != nil {
+					log.Printf("Error appending social links to Airtable: %s\n", tableAppendErr)
+				}
 	}
 }
+
+
+	
